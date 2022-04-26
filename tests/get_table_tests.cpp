@@ -88,8 +88,13 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, TESTER ) try {
    }
    produce_blocks(1);
 
+   fc::microseconds max_success_duration = fc::seconds(25);
+   fc::microseconds max_failure_duration = fc::seconds(45);
+   const uint64_t max_storage = 10'000;
+   chain_apis::trx_finality_status_processing trx_finality_status_proc(max_storage, max_success_duration, max_failure_duration);
+
    // iterate over scope
-   eosio::chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), {});
+   eosio::chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), {}, trx_finality_status_proc);
    eosio::chain_apis::read_only::get_table_by_scope_params param{"eosio.token"_n, "accounts"_n, "inita", "", 10};
    eosio::chain_apis::read_only::get_table_by_scope_result result = plugin.read_only::get_table_by_scope(param);
 
@@ -194,7 +199,12 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, TESTER ) try {
    produce_blocks(1);
 
    // get table: normal case
-   eosio::chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), {});
+   fc::microseconds max_success_duration = fc::seconds(25);
+   fc::microseconds max_failure_duration = fc::seconds(45);
+   const uint64_t max_storage = 10'000;
+   chain_apis::trx_finality_status_processing trx_finality_status_proc(max_storage, max_success_duration, max_failure_duration);
+
+   eosio::chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), {}, trx_finality_status_proc);
    eosio::chain_apis::read_only::get_table_rows_params p;
    p.code = "eosio.token"_n;
    p.scope = "inita";
@@ -363,7 +373,11 @@ BOOST_FIXTURE_TEST_CASE( get_table_by_seckey_test, TESTER ) try {
    produce_blocks(1);
 
    // get table: normal case
-   eosio::chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), {});
+   fc::microseconds max_success_duration = fc::seconds(25);
+   fc::microseconds max_failure_duration = fc::seconds(45);
+   const uint64_t max_storage = 10'000;
+   chain_apis::trx_finality_status_processing trx_finality_status_proc(max_storage, max_success_duration, max_failure_duration);
+   eosio::chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), {}, trx_finality_status_proc);
    eosio::chain_apis::read_only::get_table_rows_params p;
    p.code = "eosio"_n;
    p.scope = "eosio";
@@ -515,7 +529,12 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, TESTER ) try {
    // }
 
 
-   chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), {});
+   fc::microseconds max_success_duration = fc::seconds(25);
+   fc::microseconds max_failure_duration = fc::seconds(45);
+   const uint64_t max_storage = 10'000;
+   chain_apis::trx_finality_status_processing trx_finality_status_proc(max_storage, max_success_duration, max_failure_duration);
+
+   chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), {}, trx_finality_status_proc);
    chain_apis::read_only::get_table_rows_params params{
       .json=true,
       .code="test"_n,

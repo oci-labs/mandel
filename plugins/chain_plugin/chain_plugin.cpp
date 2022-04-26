@@ -1362,7 +1362,7 @@ chain_apis::read_write chain_plugin::get_read_write_api() {
 }
 
 chain_apis::read_only chain_plugin::get_read_only_api() const {
-   return chain_apis::read_only(chain(), my->_account_query_db, get_abi_serializer_max_time(), my->producer_plug);
+   return chain_apis::read_only(chain(), my->_account_query_db, get_abi_serializer_max_time(), my->producer_plug, *my->_trx_finality_status_processing.get());
 }
 
 
@@ -1680,6 +1680,69 @@ read_only::get_info_results read_only::get_info(const read_only::get_info_params
       app().full_version_string(),
       rm.get_total_cpu_weight(),
       rm.get_total_net_weight()
+   };
+}
+
+read_only::get_transaction_status_results read_only::get_transaction_status(const read_only::get_transaction_status_params& param) const {
+   transaction_id_type input_id;
+   auto input_id_length = param.id.size();
+   try
+   {
+      FC_ASSERT(input_id_length <= 64, "hex string is too long to represent an actual transaction id");
+      FC_ASSERT(input_id_length >= 8, "hex string representing transaction id should be at least 8 characters long to avoid excessive collisions");
+      input_id = transaction_id_type(param.id);
+   }
+   EOS_RETHROW_EXCEPTIONS(transaction_id_type_exception, "Invalid transaction ID: ${transaction_id}", ("transaction_id", param.id))
+
+   trx_finality_status_processing::chain_state ch_state = trx_finality_status_proc.get_chain_state();
+
+   // op_ts = trx_finality_status_proc.get_trx_state(input_id);
+
+   // string                               state = op_ts.status;
+   // chain::block_id_type                 block_id = op_ts.block_id;
+   // uint32_t                             block_number = chain::block_header::num_from_id(block_id);
+   // fc::time_point                       block_timestamp = op_ts.block_timestamp;
+
+   // chain::block_id_type                 head_id  = ch_state.head_id;
+   // uint32_t                             head_number = chain::block_header::num_from_id(head_id);
+   // fc::time_point                       head_timestamp = time_point_sec();
+
+   // chain::block_id_type                 irreversible_id  = ch_state.irr_id;
+   // uint32_t                             irreversible_number = chain::block_header::num_from_id(irreversible_id);
+   // fc::time_point                       irreversible_timestamp = time_point_sec();
+
+   // fc::time_point_sec                   expiration = time_point_sec();
+
+   // chain::block_id_type                 last_tracked_block_id  = ch_state.last_tracked_block_id;
+
+
+   string                               state = "TEST-STATE";
+   uint32_t                             block_number = 42;
+   chain::block_id_type                 block_id = fc::sha256();
+   fc::time_point                       block_timestamp = time_point_sec();
+   uint32_t                             head_number = 42;
+   chain::block_id_type                 head_id  = fc::sha256();
+   fc::time_point                       head_timestamp = time_point_sec();
+   uint32_t                             irreversible_number = 42;
+   chain::block_id_type                 irreversible_id  = fc::sha256();
+   fc::time_point                       irreversible_timestamp = time_point_sec();
+   fc::time_point_sec                   expiration = time_point_sec();
+   chain::block_id_type                 last_tracked_block_id  = fc::sha256();
+
+
+   return {
+      state,
+      block_number,
+      block_id,
+      block_timestamp,
+      head_number,
+      head_id,
+      head_timestamp,
+      irreversible_number,
+      irreversible_id,
+      irreversible_timestamp,
+      expiration,
+      last_tracked_block_id
    };
 }
 
