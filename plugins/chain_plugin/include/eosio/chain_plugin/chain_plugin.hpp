@@ -87,12 +87,12 @@ class read_only {
    const fc::microseconds abi_serializer_max_time;
    bool  shorten_abi_errors = true;
    const producer_plugin* producer_plug;
-   const trx_finality_status_processing& trx_finality_status_proc;
+   const trx_finality_status_processing* trx_finality_status_proc;
 
 public:
    static const string KEYi64;
 
-   read_only(const controller& db, const std::optional<account_query_db>& aqdb, const fc::microseconds& abi_serializer_max_time, const producer_plugin* producer_plug, const trx_finality_status_processing& trx_finality_status_proc)
+   read_only(const controller& db, const std::optional<account_query_db>& aqdb, const fc::microseconds& abi_serializer_max_time, const producer_plugin* producer_plug, const trx_finality_status_processing* trx_finality_status_proc)
       : db(db), aqdb(aqdb), abi_serializer_max_time(abi_serializer_max_time), producer_plug(producer_plug), trx_finality_status_proc(trx_finality_status_proc) {
    }
 
@@ -134,16 +134,16 @@ public:
 
    struct get_transaction_status_results {
       string                               state;
-      uint32_t                             block_number;
-      chain::block_id_type                 block_id;
-      fc::time_point                       block_timestamp;
+      std::optional<uint32_t>              block_number;
+      std::optional<chain::block_id_type>  block_id;
+      std::optional<fc::time_point>        block_timestamp;
+      std::optional<fc::time_point>        expiration;
       uint32_t                             head_number;
       chain::block_id_type                 head_id;
       fc::time_point                       head_timestamp;
       uint32_t                             irreversible_number;
       chain::block_id_type                 irreversible_id;
       fc::time_point                       irreversible_timestamp;
-      fc::time_point                       expiration;
       chain::block_id_type                 last_tracked_block_id;
    };
    get_transaction_status_results get_transaction_status(const get_transaction_status_params& params) const;
@@ -814,8 +814,8 @@ FC_REFLECT(eosio::chain_apis::read_only::get_info_results,
            (virtual_block_cpu_limit)(virtual_block_net_limit)(block_cpu_limit)(block_net_limit)
            (server_version_string)(fork_db_head_block_num)(fork_db_head_block_id)(server_full_version_string)(total_cpu_weight)(total_net_weight) )
 FC_REFLECT(eosio::chain_apis::read_only::get_transaction_status_params, (id) )
-FC_REFLECT(eosio::chain_apis::read_only::get_transaction_status_results, (state)(block_number)(block_id)(block_timestamp)(head_number)(head_id)
-           (head_timestamp)(irreversible_number)(irreversible_id)(irreversible_timestamp)(expiration)(last_tracked_block_id) )
+FC_REFLECT(eosio::chain_apis::read_only::get_transaction_status_results, (state)(block_number)(block_id)(block_timestamp)(expiration)(head_number)(head_id)
+           (head_timestamp)(irreversible_number)(irreversible_id)(irreversible_timestamp)(last_tracked_block_id) )
 FC_REFLECT(eosio::chain_apis::read_only::get_activated_protocol_features_params, (lower_bound)(upper_bound)(limit)(search_by_block_num)(reverse) )
 FC_REFLECT(eosio::chain_apis::read_only::get_activated_protocol_features_results, (activated_protocol_features)(more) )
 FC_REFLECT(eosio::chain_apis::read_only::get_block_params, (block_num_or_id))
