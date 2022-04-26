@@ -86,15 +86,10 @@ BOOST_FIXTURE_TEST_CASE( get_block_with_invalid_abi, TESTER ) try {
    // retrieve block num
    uint32_t headnum = this->control->head_block_num();
 
-   fc::microseconds max_success_duration = fc::seconds(25);
-   fc::microseconds max_failure_duration = fc::seconds(45);
-   const uint64_t max_storage = 10'000;
-   chain_apis::trx_finality_status_processing trx_finality_status_proc(max_storage, max_success_duration, max_failure_duration);
-
    char headnumstr[20];
    sprintf(headnumstr, "%d", headnum);
    chain_apis::read_only::get_block_params param{headnumstr};
-   chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), {}, trx_finality_status_proc);
+   chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), {}, {});
 
    // block should be decoded successfully
    std::string block_str = json::to_pretty_string(plugin.get_block(param));
