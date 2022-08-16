@@ -95,6 +95,9 @@ else()
    add_subdirectory(abieos)
 endif()
 
+add_subdirectory( trx_generator )
+add_subdirectory( performance_tests )
+
 find_package(Threads)
 add_executable(ship_client ship_client.cpp)
 target_link_libraries(ship_client abieos Boost::program_options Boost::system Threads::Threads)
